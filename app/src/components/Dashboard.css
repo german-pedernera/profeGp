@@ -1,0 +1,311 @@
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: var(--primary);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition);
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.logo-small {
+  width: 40px;
+  height: 40px;
+  background-color: var(--secondary);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.sidebar-header h3 {
+  color: var(--white);
+  margin: 0;
+  font-size: 18px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 0;
+  overflow-y: auto;
+}
+
+.nav-item {
+  width: 100%;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: transparent;
+  color: rgba(255,255,255,0.8);
+  border: none;
+  border-radius: 0;
+  justify-content: flex-start;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.nav-item:hover, .nav-item.active {
+  background-color: rgba(255,255,255,0.1);
+  color: var(--white);
+  box-shadow: none;
+  transform: none;
+}
+
+.nav-item.active {
+  border-left: 4px solid var(--secondary);
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+.submenu {
+  background-color: rgba(0,0,0,0.1);
+  padding: 8px 0;
+}
+
+.submenu-item {
+  width: 100%;
+  padding: 10px 24px 10px 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: rgba(255,255,255,0.6);
+  border: none;
+  border-radius: 0;
+  justify-content: flex-start;
+  font-size: 14px;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.submenu-item:hover, .submenu-item.active {
+  color: var(--secondary);
+  background-color: rgba(255,255,255,0.05);
+  transform: none;
+  box-shadow: none;
+}
+
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.logout-btn {
+  border-radius: var(--border-radius);
+  color: var(--white);
+}
+
+.logout-btn:hover {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: #ff6b6b;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-color);
+  overflow-y: auto;
+}
+
+.content-header {
+  padding: 24px 40px;
+  background-color: var(--white);
+  border-bottom: 1px solid var(--input-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content-header h2 {
+  margin: 0;
+  color: var(--text-main);
+}
+
+.user-role {
+  background-color: var(--primary-light);
+  color: var(--white);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.content-body {
+  padding: 40px;
+}
+
+.full-width-card {
+  max-width: 100%;
+}
+
+.video-container {
+  margin-top: 24px;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.video-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--white);
+  background: linear-gradient(45deg, #1a1a1a, #333);
+}
+
+.play-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: var(--secondary);
+}
+
+.placeholder-tabla {
+  padding: 40px;
+  background-color: #f9f9f9;
+  border: 1px dashed #ccc;
+  text-align: center;
+  color: #666;
+  border-radius: 8px;
+}
+
+/* Mobile Sidebar & Hamburger Styles */
+.mobile-hamburger {
+  display: none;
+}
+
+.mobile-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    position: relative;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    transform: translateX(-100%);
+    width: 280px;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.5);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .mobile-hamburger {
+    display: flex !important;
+    border: none;
+    position: absolute;
+    z-index: 999;
+    cursor: pointer;
+  }
+
+  .mobile-overlay {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+  }
+
+  /* Make sure all headers leave space for hamburger and stack on mobile */
+  .content-header, 
+  .admin-header, 
+  .carga-header {
+    padding-left: 70px !important;
+    padding-right: 20px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+
+  /* Stack header elements vertically */
+  .header-left,
+  .content-header > div:first-child,
+  .admin-header > div:first-child,
+  .carga-header > div:first-child {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  /* Prevent search container from wrapping its icon and input */
+  .search-container {
+    width: 100% !important;
+    max-width: none !important;
+    flex-wrap: nowrap !important;
+  }
+
+  /* Adjust title sizes */
+  .content-header h2,
+  .admin-header h2,
+  .carga-header h2 {
+    font-size: 1.4rem !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  /* Make sure tables and cards don't overflow */
+  .stats-container,
+  .admin-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-section {
+    grid-column: span 1 !important;
+    overflow-x: auto !important;
+  }
+
+  .admin-table {
+    min-width: 600px;
+  }
+
+  .planilla-actions {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .admin-content,
+  .content-body {
+    padding: 16px !important;
+  }
+}

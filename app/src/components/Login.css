@@ -1,0 +1,158 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+}
+
+.login-card {
+  background: var(--white);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.round-logo {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background-color: var(--white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  animation: floatLogo 3s ease-in-out infinite;
+  margin: 10px;
+}
+
+@keyframes floatLogo {
+  0% { transform: translateY(0px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+  50% { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(0,0,0,0.25); }
+  100% { transform: translateY(0px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+}
+
+.round-logo img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+.input-group {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 24px 0;
+  color: var(--text-muted);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--input-border);
+}
+
+.divider span {
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+.error-message {
+  background-color: #fdeaea;
+  color: var(--error);
+  padding: 12px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #fad2d2;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button:hover {
+  color: var(--error);
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Password Input Wrapper */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  padding-right: 40px; /* Space for the icon */
+}
+
+.eye-icon-btn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.eye-icon-btn:hover {
+  color: var(--primary);
+  background: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Modal Input Specific Styles (Reference Image) */
+.modal-content .input-group input {
+  background-color: #f0f4f8; /* Light blueish gray from image */
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #1f2937;
+  padding: 10px 14px;
+}
+
+.modal-content .input-group input:focus {
+  background-color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(17, 66, 50, 0.1);
+}
+
