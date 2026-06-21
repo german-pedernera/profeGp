@@ -8,7 +8,6 @@ import AdminPanel from './components/AdminPanel';
 import HistorialPlanillas from './components/HistorialPlanillas';
 import Layout from './components/Layout';
 import './app-animations.css';
-import logo from './assets/logo-gendarmeria.png';
 
 const ProtectedRoute = ({ user, userData, requiredRole, children }) => {
   if (!user) return <Navigate to="/login" />;
@@ -46,7 +45,7 @@ function App() {
       setTimeout(() => {
         setIsExitingSplash(true);
         setTimeout(() => setLoading(false), 500);
-      }, 4000); // Mínimo 4s para apreciar la cascada de logos
+      }, 1000);
     };
 
     checkSession();
@@ -55,12 +54,23 @@ function App() {
   if (loading) {
     return (
       <div className={`splash-screen ${isExitingSplash ? 'exiting' : ''}`}>
-        <div className="logo-cascade-container">
-          <img src={logo} alt="Profe Gp Logo" className="splash-logo-cascade cascade-1" />
-          <img src={logo} alt="Profe Gp Logo" className="splash-logo-cascade cascade-2" />
-          <img src={logo} alt="Profe Gp Logo" className="splash-logo-cascade cascade-3" />
-          <img src={logo} alt="Profe Gp Logo" className="splash-logo-cascade cascade-4" />
-          <img src={logo} alt="Profe Gp Logo" className="splash-logo-cascade cascade-main" />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+          <div className="modern-spinner" style={{
+            width: '50px',
+            height: '50px',
+            borderRadius: '50%',
+            border: '3px solid rgba(255,255,255,0.1)',
+            borderTopColor: '#ffffff',
+            animation: 'spin 1s linear infinite'
+          }} />
+          <style>{`
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+          <div style={{ color: '#ffffff', fontSize: '1.2rem', fontWeight: '500', letterSpacing: '1px', opacity: 0.8 }}>
+            Cargando...
+          </div>
         </div>
       </div>
     );

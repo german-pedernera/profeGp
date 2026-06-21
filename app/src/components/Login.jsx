@@ -63,8 +63,8 @@ const Login = ({ user, userData }) => {
          }
          
          try {
-           const token = "8828507915:AAGMoiBuuRAwozHqYKnq1Vf56k2b33bEsTM";
-           const chatId = "1222847704";
+           const token = import.meta.env.VITE_TELEGRAM_TOKEN;
+           const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
            const message = `🟢 <b>Admin Inició Sesión</b>\n\n👤 <b>Usuario:</b> ${userName}\n📧 <b>Email:</b> ${email}\n⏱ <b>Hora:</b> ${now}`;
            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
              method: 'POST',
@@ -94,8 +94,8 @@ const Login = ({ user, userData }) => {
          }
 
          try {
-           const token = "8828507915:AAGMoiBuuRAwozHqYKnq1Vf56k2b33bEsTM";
-           const chatId = "1222847704";
+           const token = import.meta.env.VITE_TELEGRAM_TOKEN;
+           const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
            const message = `🟢 <b>Nuevo Inicio de Sesión</b>\n\n👤 <b>Usuario:</b> ${userName}\n📧 <b>Email:</b> ${email}\n⏱ <b>Hora:</b> ${now}`;
            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
              method: 'POST',
@@ -171,8 +171,8 @@ const Login = ({ user, userData }) => {
       }
 
       try {
-        const token = "8828507915:AAGMoiBuuRAwozHqYKnq1Vf56k2b33bEsTM";
-        const chatId = "1222847704";
+        const token = import.meta.env.VITE_TELEGRAM_TOKEN;
+        const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
         const message = `🔔 <b>Nuevo Registro Pendiente</b>\n\n👤 <b>Nombre:</b> ${regData.nombre} ${regData.apellido}\n📧 <b>Email:</b> ${emailForAuth}\n📱 <b>Teléfono:</b> ${regData.telefono}\n\nPor favor, ingresa al panel de administración para aceptar o rechazar a este usuario.`;
         
         await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -209,13 +209,7 @@ const Login = ({ user, userData }) => {
   return (
     <div className="login-container">
       <div className="login-card card">
-        <div className="logo-container">
-          <div className="round-logo">
-            <img src="/gendarmeria-logo-placeholder.png" alt="Logo" onError={(e) => { e.target.style.display='none'; e.target.parentElement.innerHTML = 'profeGp'; }} />
-          </div>
-        </div>
-        
-        <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>Sistema de Registro</h2>
+        <h2 style={{ textAlign: 'center', marginTop: '16px', marginBottom: '24px' }}>Sistema de Registro</h2>
         
         {errorMsg && <div className="error-message">{errorMsg}</div>}
 

@@ -10,8 +10,32 @@
   color: var(--white);
   padding: 20px 40px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 20px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-right {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-ver-lista {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: white;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .carga-header h2 {
@@ -135,4 +159,99 @@
   border-radius: var(--border-radius);
   margin-bottom: 24px;
   border: 1px solid #c3e6cb;
+}
+
+/* Responsive Grids */
+.grid-2-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.grid-3-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.divider {
+  width: 1px;
+  height: 100%;
+  background: rgba(255,255,255,0.2);
+}
+
+.resultados-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .carga-header {
+    padding: 16px;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .header-left {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .header-right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .carga-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .carga-content {
+    padding: 16px;
+  }
+
+  .carga-form fieldset {
+    padding: 16px !important;
+  }
+
+  .grid-2-cols,
+  .grid-3-cols,
+  .resultados-grid {
+    grid-template-columns: 1fr !important; /* Stack vertically */
+    gap: 16px !important;
+  }
+
+  .prueba-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .badge {
+    width: 100%;
+  }
+
+  .info-box {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+  }
+  
+  .form-actions {
+    justify-content: stretch;
+  }
+  
+  .form-actions button {
+    width: 100%;
+    justify-content: center;
+  }
 }

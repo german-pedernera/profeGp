@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LogOut, Home, Activity, Calendar, Shield, ChevronDown, ChevronUp, ChevronRight, Menu, FileText } from 'lucide-react';
 import { tablasData } from '../data/tablasExigencias';
-import logo from '../assets/logo-gendarmeria.png';
 import './Dashboard.css'; // Reusing dashboard styles for sidebar
 
 const Layout = ({ userData, children }) => {
@@ -77,9 +76,8 @@ const Layout = ({ userData, children }) => {
 
       {/* Sidebar */}
       <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`} style={{ width: '280px', flexShrink: 0, overflowY: 'auto' }}>
-        <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '24px' }}>
-          <img src={logo} alt="Logo Gendarmería" style={{ height: '50px', width: 'auto', objectFit: 'contain' }} />
-          <h3 style={{ margin: 0, fontSize: '22px', fontWeight: '700', color: 'var(--white)', letterSpacing: '0.5px' }}>Profe Gp</h3>
+        <div className="sidebar-header" style={{ padding: '24px' }}>
+          <h3 style={{ margin: 0, fontSize: '22px', fontWeight: '700', color: 'var(--white)', letterSpacing: '0.5px' }}>Evaluación Física</h3>
         </div>
         
         <nav className="sidebar-nav">

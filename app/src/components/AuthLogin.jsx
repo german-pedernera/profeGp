@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { LogIn, UserPlus, X, Eye, EyeOff } from 'lucide-react';
-import logo from '../assets/logo-gendarmeria.png';
 import './Login.css';
 
 const AuthLogin = () => {
@@ -105,8 +104,8 @@ const AuthLogin = () => {
       document.querySelector('.login-container').classList.add('page-exit');
 
       try {
-        const token = "8828507915:AAGMoiBuuRAwozHqYKnq1Vf56k2b33bEsTM";
-        const chatId = "1222847704";
+        const token = import.meta.env.VITE_TELEGRAM_TOKEN;
+        const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
         const message = `🟢 <b>Nuevo Inicio de Sesión</b>\n\n👤 <b>Usuario:</b> ${user.nombre} ${user.apellido}\n📧 <b>Email:</b> ${user.email}\n⏱ <b>Hora:</b> ${now}`;
         await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method: 'POST',
@@ -168,8 +167,8 @@ const AuthLogin = () => {
       localStorage.setItem('gp_users', JSON.stringify(users));
 
       try {
-        const token = "8828507915:AAGMoiBuuRAwozHqYKnq1Vf56k2b33bEsTM";
-        const chatId = "1222847704";
+        const token = import.meta.env.VITE_TELEGRAM_TOKEN;
+        const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
         const message = `🔔 <b>Nuevo Registro Pendiente</b>\n\n👤 <b>Nombre:</b> ${newUser.nombre} ${newUser.apellido}\n📧 <b>Email:</b> ${newUser.email}\n📱 <b>Teléfono:</b> ${newUser.telefono}\n\nPor favor, ingresa al panel de administración para aceptar o rechazar a este usuario.`;
         
         await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -252,14 +251,8 @@ const AuthLogin = () => {
   return (
     <div className="login-container page-enter">
       <div className="login-card card">
-        <div className="logo-container">
-          <div className="round-logo">
-            <img src={logo} alt="Logo" />
-          </div>
-        </div>
-        
-        <h2 className="text-center" style={{ marginBottom: '24px', color: 'var(--primary)' }}>
-          Sistema de Registro Profe Gp
+        <h2 className="text-center" style={{ marginTop: '16px', marginBottom: '24px', color: 'var(--primary)' }}>
+          Sistema de Registro
         </h2>
         
         {errorMsg && <div className="error-message">{errorMsg}</div>}

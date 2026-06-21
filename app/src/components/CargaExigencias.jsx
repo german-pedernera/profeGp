@@ -5,7 +5,6 @@ import { ArrowLeft, Save, List, FileSpreadsheet } from 'lucide-react';
 import { exportPlanillaToExcel } from '../utils/excelExport';
 import { jerarquias, sortEvaluations } from '../utils/constants';
 import { tablasData } from '../data/tablasExigencias';
-import logoGendarmeria from '../assets/logo-gendarmeria.png';
 import './CargaExigencias.css';
 
 
@@ -424,15 +423,15 @@ const CargaExigencias = ({ userData }) => {
 
   return (
     <div className="carga-layout page-enter">
-      <header className="carga-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <header className="carga-header">
+        <div className="header-left">
           <button className="icon-button back-btn" onClick={() => navigate('/dashboard')}>
             <ArrowLeft size={24} /> Volver
           </button>
           <h2>Carga de Exigencias Físicas</h2>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button type="button" onClick={handleOpenModal} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: 'white', color: 'var(--primary)', border: '1px solid var(--primary)', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+        <div className="header-right">
+          <button type="button" onClick={handleOpenModal} className="btn-ver-lista">
             <List size={18} />
             Ver Lista
           </button>
@@ -464,10 +463,10 @@ const CargaExigencias = ({ userData }) => {
       <div className="carga-content">
         <div className="card full-width-card">
           <form className="carga-form" onSubmit={handleSubmit}>
-            <fieldset style={{ padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '32px', background: '#f8fafc' }}>
+            <fieldset style={{ borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '32px', background: '#f8fafc' }}>
               <legend style={{ fontSize: '1.2em', fontWeight: 'bold', padding: '0 16px', color: 'var(--primary)', background: '#f8fafc', borderRadius: '8px' }}>Datos Personales</legend>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+              <div className="grid-2-cols">
                 <div className="form-group">
                   <label>Jerarquía</label>
                   <select name="jerarquia" value={formData.jerarquia} onChange={handleInputChange} required title="Selecciona la jerarquía o grado actual">
@@ -481,7 +480,7 @@ const CargaExigencias = ({ userData }) => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+              <div className="grid-3-cols">
                 <div className="form-group">
                   <label>Talla (m)</label>
                   <input type="number" step="0.01" name="talla" value={formData.talla} onChange={handleInputChange} required placeholder="Ej: 1.75" title="Ingresa tu estatura en metros (ej. 1.75)" />
@@ -496,7 +495,7 @@ const CargaExigencias = ({ userData }) => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div className="grid-2-cols">
                 <div className="form-group">
                   <label>Sexo</label>
                   <select name="sexo" value={formData.sexo} onChange={handleInputChange} title="Selecciona tu sexo biológico">
@@ -506,15 +505,15 @@ const CargaExigencias = ({ userData }) => {
                 </div>
                 <div className="info-box" style={{ background: 'var(--primary)', color: 'white', padding: '16px 24px', borderRadius: '8px', display: 'flex', justifyContent: 'space-around', alignItems: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
                   <div style={{ fontSize: '1.1em' }}><strong style={{opacity: 0.8}}>Edad:</strong> <span style={{fontSize: '1.2em', fontWeight: 'bold'}}>{edad} años</span></div>
-                  <div style={{ width: '1px', height: '100%', background: 'rgba(255,255,255,0.2)' }}></div>
+                  <div className="divider"></div>
                   <div style={{ fontSize: '1.1em' }}><strong style={{opacity: 0.8}}>Categoría:</strong> <span style={{fontSize: '1.2em', fontWeight: 'bold'}}>{categoria}</span></div>
                 </div>
               </div>
             </fieldset>
 
-            <fieldset style={{ padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '24px', background: '#f8fafc' }}>
+            <fieldset style={{ borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '24px', background: '#f8fafc' }}>
               <legend style={{ fontSize: '1.2em', fontWeight: 'bold', padding: '0 16px', color: 'var(--primary)', background: '#f8fafc', borderRadius: '8px' }}>Resultados de Exigencias</legend>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+              <div className="resultados-grid">
                 {/* Carrera Aeróbica */}
                 <div className="prueba-item" style={{ background: '#fff', padding: '20px', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
                   <label style={{ display: 'block', marginBottom: '12px', fontWeight: '600', color: '#334155' }}>Carrera Aeróbica (min.seg)</label>
@@ -614,7 +613,6 @@ const CargaExigencias = ({ userData }) => {
           <div className={`modal-content modal-content-anim ${isClosingModal ? 'closing' : ''}`} style={{ background: '#fff', padding: '32px', borderRadius: '16px', width: '100%', maxWidth: '1400px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                <img src={logoGendarmeria} alt="Escudo Gendarmería" style={{ height: '65px', width: 'auto', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }} />
                 <h2 style={{ color: 'var(--primary)', margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>Planilla de Resumen</h2>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

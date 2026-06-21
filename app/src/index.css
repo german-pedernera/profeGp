@@ -118,6 +118,10 @@ button.outline:hover {
   width: 100%;
 }
 
+.full-width-card {
+  max-width: 100%;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
