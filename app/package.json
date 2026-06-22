@@ -14,13 +14,10 @@
     "dotenv": "^17.4.2",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
-    "jspdf": "^4.2.1",
-    "jspdf-autotable": "^5.0.8",
     "lucide-react": "^1.21.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-router-dom": "^7.18.0",
-    "xlsx": "^0.18.5"
+    "react-router-dom": "^7.18.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
