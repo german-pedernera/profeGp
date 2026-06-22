@@ -23,16 +23,18 @@ const AdminPanel = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch Users from localStorage instead of Supabase to bypass rate limits
-      const usersData = localStorage.getItem('gp_users');
-      let parsedUsers = usersData ? JSON.parse(usersData) : [];
+      // Fetch Users from Supabase
+      const { data: usersData, error: usersError } = await supabase.from('users').select('*');
+      if (usersError) throw usersError;
       
+      let parsedUsers = usersData || [];
+      
+      // Asegurarse de que exista el administrador (fallback por si no está en la base de datos)
       const adminIndex = parsedUsers.findIndex(u => u.role === 'admin' || u.email === 'pederneragerman@gmail.com' || u.email === 'pederneragerman@mail.com');
       if (adminIndex === -1) {
-        parsedUsers.push({
+        const fallbackAdmin = {
           id: 'admin-id',
           email: 'pederneragerman@gmail.com',
-          password: 'Emi25$',
           role: 'admin',
           status: 'approved',
           nombre: 'German',
@@ -40,21 +42,26 @@ const AdminPanel = () => {
           fechaNacimiento: '1980-01-01',
           telefono: '1234567890',
           lastLogin: 'Nunca'
-        });
-        localStorage.setItem('gp_users', JSON.stringify(parsedUsers));
+        };
+        parsedUsers.push(fallbackAdmin);
       }
 
       setUsers(parsedUsers);
 
       // Fetch Evaluations
       const { data: evalData, error: evalError } = await supabase.from('evaluations').select('*');
-      if (evalError) throw evalError;
+      let totalEvals = 0;
+      if (!evalError && evalData) {
+        totalEvals = evalData.length;
+      } else {
+        console.warn("Could not fetch evaluations:", evalError);
+      }
 
       // Calculate Stats
       setStats({
         totalUsers: parsedUsers.length,
         pendingUsers: parsedUsers.filter(u => u.status === 'pending').length,
-        totalEvals: evalData.length
+        totalEvals: totalEvals
       });
 
     } catch (error) {
@@ -71,17 +78,9 @@ const AdminPanel = () => {
 
   const handleApproveUser = async (userId) => {
     try {
-      const usersData = localStorage.getItem('gp_users');
-      if (usersData) {
-        let usersList = JSON.parse(usersData);
-        const userIndex = usersList.findIndex(u => u.id === userId);
-        if (userIndex !== -1) {
-          usersList[userIndex].status = 'approved';
-          localStorage.setItem('gp_users', JSON.stringify(usersList));
-          setUsers(usersList);
-          fetchData();
-        }
-      }
+      const { error } = await supabase.from('users').update({ status: 'approved' }).eq('id', userId);
+      if (error) throw error;
+      fetchData();
     } catch (error) {
       console.error("Error approving user", error);
     }
@@ -95,14 +94,6 @@ const AdminPanel = () => {
         try {
           const { error } = await supabase.from('users').delete().eq('id', userId);
           if (error) console.error("Supabase delete error:", error);
-          
-          // Eliminar de localStorage
-          const usersData = localStorage.getItem('gp_users');
-          if (usersData) {
-            let usersList = JSON.parse(usersData);
-            usersList = usersList.filter(u => u.id !== userId);
-            localStorage.setItem('gp_users', JSON.stringify(usersList));
-          }
           
           fetchData();
         } catch (error) {
@@ -136,17 +127,21 @@ const AdminPanel = () => {
     setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
   };
 
-  const handleUpdateUser = (e) => {
+  const handleUpdateUser = async (e) => {
     e.preventDefault();
-    const usersData = localStorage.getItem('gp_users');
-    let currentUsers = usersData ? JSON.parse(usersData) : [];
-    
-    const index = currentUsers.findIndex(u => u.id === editingUser.id);
-    if (index !== -1) {
-      currentUsers[index] = { ...currentUsers[index], ...editFormData };
-      localStorage.setItem('gp_users', JSON.stringify(currentUsers));
-      setUsers(currentUsers);
+    try {
+      const { error } = await supabase.from('users').update({
+        nombre: editFormData.nombre,
+        apellido: editFormData.apellido,
+        email: editFormData.email,
+        fechaNacimiento: editFormData.fechaNacimiento,
+        telefono: editFormData.telefono
+      }).eq('id', editingUser.id);
+      if (error) throw error;
       setEditingUser(null);
+      fetchData();
+    } catch (error) {
+      console.error("Error updating user", error);
     }
   };
 

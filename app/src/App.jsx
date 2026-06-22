@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-import AuthLogin from './components/AuthLogin';
+import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import CargaExigencias from './components/CargaExigencias';
 import AdminPanel from './components/AdminPanel';
@@ -79,7 +79,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={!user ? <AuthLogin /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/login" element={!user ? <Login user={user} userData={userData} /> : <Navigate to="/dashboard" replace />} />
         
         <Route path="/dashboard" element={
           <ProtectedRoute user={user} userData={userData}>

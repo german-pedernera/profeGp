@@ -62,6 +62,9 @@ const Login = ({ user, userData }) => {
             }
          }
          
+         const adminSession = { id: 'admin-id', email: email, role: 'admin', status: 'approved', nombre: 'German', apellido: 'Pedernera' };
+         sessionStorage.setItem('gp_session', JSON.stringify(adminSession));
+         
          try {
            const token = import.meta.env.VITE_TELEGRAM_TOKEN;
            const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
@@ -90,6 +93,16 @@ const Login = ({ user, userData }) => {
                usersList[userIndex].lastLogin = now;
                userName = `${usersList[userIndex].nombre} ${usersList[userIndex].apellido}`;
                localStorage.setItem('gp_users', JSON.stringify(usersList));
+               
+               const sessionUser = { ...usersList[userIndex] };
+               delete sessionUser.password;
+               sessionStorage.setItem('gp_session', JSON.stringify(sessionUser));
+            } else {
+               // Si no está en localStorage, intentamos obtener de Supabase y guardar la sesión
+               const { data: dbUser } = await supabase.from('users').select('*').eq('email', email).single();
+               if (dbUser) {
+                 sessionStorage.setItem('gp_session', JSON.stringify(dbUser));
+               }
             }
          }
 
