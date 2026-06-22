@@ -7,9 +7,15 @@ import './Dashboard.css'; // Reusing dashboard styles for sidebar
 const Layout = ({ userData, children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [showSubMenu, setShowSubMenu] = useState(false);
+  const [showSubMenu, setShowSubMenu] = useState(() => !!new URLSearchParams(location.search).get('tabla'));
   const [alertMessage, setAlertMessage] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get('tabla')) {
+      setShowSubMenu(true);
+    }
+  }, [location.search]);
 
   // Auto-close menu after 3 seconds of inactivity on mobile
   useEffect(() => {
@@ -87,13 +93,13 @@ const Layout = ({ userData, children }) => {
           </button>
           
           <div className="nav-group">
-            <button className={`nav-item ${showSubMenu || new URLSearchParams(location.search).get('tabla') ? 'active' : ''}`} onClick={() => setShowSubMenu(!showSubMenu)}>
+            <button className={`nav-item ${showSubMenu ? 'active' : ''}`} onClick={() => setShowSubMenu(!showSubMenu)}>
               <FileText size={20} />
               <span style={{ flex: 1, textAlign: 'left', whiteSpace: 'nowrap' }}>Tablas de Exigencias</span>
               {showSubMenu ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
             
-            {(showSubMenu || new URLSearchParams(location.search).get('tabla')) && (
+            {showSubMenu && (
               <div className="submenu">
                 {tablasExigencias.map((tabla, index) => (
                   <button 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { sendTelegramMessage } from '../utils/telegram';
 import { LogIn, UserPlus, X, Eye, EyeOff } from 'lucide-react';
 import './Login.css';
 
@@ -66,14 +67,8 @@ const Login = ({ user, userData }) => {
          sessionStorage.setItem('gp_session', JSON.stringify(adminSession));
          
          try {
-           const token = import.meta.env.VITE_TELEGRAM_TOKEN || '8828507915:AAGMoiBuuRAwozHqYKnq1Vf56k2b33bEsTM';
-           const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || '1222847704';
            const message = `🟢 <b>Admin Inició Sesión</b>\n\n👤 <b>Usuario:</b> ${userName}\n📧 <b>Email:</b> ${email}\n⏱ <b>Hora:</b> ${now}`;
-           await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' })
-           });
+           await sendTelegramMessage(message);
          } catch (err) {
            console.error("Telegram notification error:", err);
          }
@@ -87,50 +82,46 @@ const Login = ({ user, userData }) => {
             // Fallback: check if the user exists in the 'users' table directly (for manually added users)
             const { data: fallbackUser } = await supabase.from('users').select('*').eq('email', email).single();
             if (fallbackUser && fallbackUser.password === password) {
+               if (fallbackUser.status !== 'approved') {
+                  throw new Error('Su cuenta aún no ha sido aprobada por el administrador.');
+               }
                authSuccess = true;
             } else {
-               throw error;
+               throw new Error('Credenciales inválidas.');
             }
          } else {
+            // Check status for auth users too
+            const { data: authDbUser } = await supabase.from('users').select('*').eq('email', email).single();
+            if (authDbUser && authDbUser.status !== 'approved') {
+               await supabase.auth.signOut();
+               throw new Error('Su cuenta aún no ha sido aprobada por el administrador.');
+            }
             authSuccess = true;
          }
          
          if (authSuccess) {
-         
-         const usersData = localStorage.getItem('gp_users');
-         let userName = 'Usuario Desconocido';
-         if (usersData) {
-            let usersList = JSON.parse(usersData);
-            const userIndex = usersList.findIndex(u => u.email === email);
-            if (userIndex !== -1) {
-               usersList[userIndex].lastLogin = now;
-               userName = `${usersList[userIndex].nombre} ${usersList[userIndex].apellido}`;
-               localStorage.setItem('gp_users', JSON.stringify(usersList));
-               
-               const sessionUser = { ...usersList[userIndex] };
+            let userName = 'Usuario Desconocido';
+            const { data: dbUser } = await supabase.from('users').select('*').eq('email', email).single();
+            
+            if (dbUser) {
+               userName = `${dbUser.nombre} ${dbUser.apellido}`;
+               const sessionUser = { ...dbUser };
                delete sessionUser.password;
                sessionStorage.setItem('gp_session', JSON.stringify(sessionUser));
-            } else {
-               // Si no está en localStorage, intentamos obtener de Supabase y guardar la sesión
-               const { data: dbUser } = await supabase.from('users').select('*').eq('email', email).single();
-               if (dbUser) {
-                 sessionStorage.setItem('gp_session', JSON.stringify(dbUser));
-               }
             }
-         }
-
-         try {
-           const token = import.meta.env.VITE_TELEGRAM_TOKEN || '8828507915:AAGMoiBuuRAwozHqYKnq1Vf56k2b33bEsTM';
-           const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || '1222847704';
-           const message = `🟢 <b>Nuevo Inicio de Sesión</b>\n\n👤 <b>Usuario:</b> ${userName}\n📧 <b>Email:</b> ${email}\n⏱ <b>Hora:</b> ${now}`;
-           await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' })
-           });
-         } catch (err) {
-           console.error("Telegram notification error:", err);
-         }
+            
+            // Notification
+            try {
+               const now = new Date().toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });
+               const message = `🟢 <b>Usuario Inició Sesión</b>\n\n👤 <b>Usuario:</b> ${userName}\n📧 <b>Email:</b> ${email}\n⏱ <b>Hora:</b> ${now}`;
+               await sendTelegramMessage(message);
+            } catch (err) {
+               console.error("Telegram notification error:", err);
+            }
+            
+            // Redirect
+            window.location.href = '/dashboard';
+            return;
          }
       }
     } catch (error) {
@@ -191,6 +182,7 @@ const Login = ({ user, userData }) => {
           telefono: regData.telefono,
           fechaNacimiento: regData.fechaNacimiento,
           email: emailForAuth,
+          password: regData.password,
           status: 'pending',
           role: 'user'
         });
@@ -198,21 +190,8 @@ const Login = ({ user, userData }) => {
       }
 
       try {
-        const token = import.meta.env.VITE_TELEGRAM_TOKEN || '8828507915:AAGMoiBuuRAwozHqYKnq1Vf56k2b33bEsTM';
-        const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || '1222847704';
         const message = `🔔 <b>Nuevo Registro Pendiente</b>\n\n👤 <b>Nombre:</b> ${regData.nombre} ${regData.apellido}\n📧 <b>Email:</b> ${emailForAuth}\n📱 <b>Teléfono:</b> ${regData.telefono}\n\nPor favor, ingresa al panel de administración para aceptar o rechazar a este usuario.`;
-        
-        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: message,
-            parse_mode: 'HTML'
-          })
-        });
+        await sendTelegramMessage(message);
       } catch (err) {
         console.error("Error enviando notificacion a Telegram:", err);
       }
@@ -287,9 +266,7 @@ const Login = ({ user, userData }) => {
           </button>
         </form>
 
-        <div className="divider">
-          <span>O</span>
-        </div>
+
 
         <button 
           type="button" 

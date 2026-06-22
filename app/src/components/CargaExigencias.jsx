@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { sendTelegramMessage } from '../utils/telegram';
 import { ArrowLeft, Save, List, FileSpreadsheet } from 'lucide-react';
 import { exportPlanillaToExcel } from '../utils/excelExport';
 import { jerarquias, sortEvaluations } from '../utils/constants';
@@ -250,9 +251,11 @@ const CargaExigencias = ({ userData }) => {
       const updatedEvals = localEvals.map(e => e.id === editingId ? { ...e, ...newEvaluation } : e);
       localStorage.setItem('gp_evaluations', JSON.stringify(updatedEvals));
       setMessage('Evaluación actualizada sin novedad');
+      sendTelegramMessage(`✏️ <b>Evaluación Editada</b>\n\nEvaluador: ${userData?.email || 'Desconocido'}\nPersona: ${formData.nombreApellido}`);
     } else {
       localStorage.setItem('gp_evaluations', JSON.stringify([newEvaluation, ...localEvals]));
       setMessage('Persona cargada sin novedad');
+      sendTelegramMessage(`✅ <b>Nueva Evaluación Guardada</b>\n\nEvaluador: ${userData?.email || 'Desconocido'}\nPersona: ${formData.nombreApellido}`);
     }
     
     setEditingId(null);
@@ -375,6 +378,8 @@ const CargaExigencias = ({ userData }) => {
       } catch {
         console.log("Guardada localmente");
       }
+
+      await sendTelegramMessage(`📋 <b>Planilla Guardada</b>\n\nEvaluador: ${userData?.email || 'Desconocido'}\nFecha: ${todayStr}\nPersonas Evaluadas: ${evaluations.length}`);
 
       closeDialog();
       showDialog('alert', 'Éxito', `Planilla guardada exitosamente.\nFecha: ${todayStr}`, () => {
@@ -630,7 +635,7 @@ const CargaExigencias = ({ userData }) => {
               </div>
             </div>
 
-            <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center', minWidth: '1200px', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: '#f8fafc', borderBottom: '1px solid #cbd5e1' }}>

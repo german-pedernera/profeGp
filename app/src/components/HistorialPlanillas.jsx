@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { sendTelegramMessage } from '../utils/telegram';
 import { Search, Calendar, User, Download, ArrowLeft, Trash2, X } from 'lucide-react';
 import { exportPlanillaToExcel } from '../utils/excelExport';
 import { sortEvaluations } from '../utils/constants';
@@ -80,6 +81,8 @@ const HistorialPlanillas = ({ userData }) => {
       } catch {
         console.log('Error deleting from supabase');
       }
+
+      await sendTelegramMessage(`🗑️ <b>Planilla Eliminada</b>\n\nUsuario que eliminó: ${userData?.email || 'Desconocido'}\nID Planilla: ${id}`);
 
       setPlanillas(planillas.filter(p => p.id !== id));
       closeDialog();
@@ -256,7 +259,7 @@ const HistorialPlanillas = ({ userData }) => {
               </div>
             </div>
 
-            <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center', minWidth: '1200px', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: '#f8fafc', borderBottom: '1px solid #cbd5e1' }}>

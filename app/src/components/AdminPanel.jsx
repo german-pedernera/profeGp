@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { sendTelegramMessage } from '../utils/telegram';
 import { Users, Trash2, CheckCircle, Database, ArrowLeft, RefreshCw, Activity, Eye, EyeOff, X, Edit, UserPlus } from 'lucide-react';
 import './AdminPanel.css';
 
@@ -86,6 +87,12 @@ const AdminPanel = () => {
     try {
       const { error } = await supabase.from('users').update({ status: 'approved' }).eq('id', userId);
       if (error) throw error;
+      
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        await sendTelegramMessage(`✅ <b>Usuario Aprobado</b>\n\n👤 <b>Nombre:</b> ${user.nombre} ${user.apellido}\n📧 <b>Email:</b> ${user.email}`);
+      }
+      
       fetchData();
     } catch (error) {
       console.error("Error approving user", error);
@@ -100,6 +107,11 @@ const AdminPanel = () => {
         try {
           const { error } = await supabase.from('users').delete().eq('id', userId);
           if (error) console.error("Supabase delete error:", error);
+          
+          const user = users.find(u => u.id === userId);
+          if (user) {
+            await sendTelegramMessage(`❌ <b>Usuario Eliminado</b>\n\n👤 <b>Nombre:</b> ${user.nombre} ${user.apellido}\n📧 <b>Email:</b> ${user.email}`);
+          }
           
           fetchData();
         } catch (error) {
@@ -145,6 +157,9 @@ const AdminPanel = () => {
         password: editFormData.password
       }).eq('id', editingUser.id);
       if (error) throw error;
+      
+      await sendTelegramMessage(`✏️ <b>Usuario Editado</b>\n\n👤 <b>Nombre:</b> ${editFormData.nombre} ${editFormData.apellido}\n📧 <b>Email:</b> ${editFormData.email}`);
+      
       setEditingUser(null);
       fetchData();
     } catch (error) {
@@ -180,6 +195,8 @@ const AdminPanel = () => {
         role: 'user'
       });
       if (insertError) throw insertError;
+
+      await sendTelegramMessage(`➕ <b>Usuario Agregado Manualmente</b>\n\n👤 <b>Nombre:</b> ${addUserData.nombre} ${addUserData.apellido}\n📧 <b>Email:</b> ${emailForAuth}`);
 
       setShowAddUserModal(false);
       setAddUserData({ nombre: '', apellido: '', email: '', password: '', fechaNacimiento: '', telefono: '' });
@@ -258,8 +275,8 @@ const AdminPanel = () => {
                 <UserPlus size={16} /> Agregar Usuario Activo
               </button>
             </div>
-            <div style={{ width: '100%' }}>
-              <table className="admin-table" style={{ width: '100%' }}>
+            <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <table className="admin-table" style={{ width: '100%', minWidth: '800px' }}>
                 <thead>
                 <tr>
                   <th>Nombre</th>
@@ -296,7 +313,7 @@ const AdminPanel = () => {
                           </button>
                         </div>
                       ) : (
-                        <span style={{ color: 'var(--text-light)', fontStyle: 'italic' }}>No disponible</span>
+                        <span style={{ color: '#ef4444', fontStyle: 'italic', fontSize: '0.9em' }}>Sin asignar</span>
                       )}
                     </td>
                     <td>{u.role === 'admin' ? 'Administrador' : 'Usuario'}</td>
@@ -412,8 +429,8 @@ const AdminPanel = () => {
                 <input type="tel" name="telefono" value={editFormData.telefono} onChange={handleEditChange} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', color: '#475569', fontSize: '14px', fontWeight: '500' }}>Contraseña</label>
-                <input type="text" name="password" value={editFormData.password} onChange={handleEditChange} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+                <label style={{ display: 'block', marginBottom: '5px', color: '#475569', fontSize: '14px', fontWeight: '500' }}>Contraseña (Dejar en blanco para mantener la actual o para no asignar)</label>
+                <input type="text" name="password" value={editFormData.password} onChange={handleEditChange} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
               </div>
               <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                 <button type="button" onClick={() => setEditingUser(null)} style={{ flex: 1, padding: '10px', borderRadius: '6px', background: '#f1f5f9', border: '1px solid #cbd5e1', cursor: 'pointer', color: '#475569', fontWeight: 'bold' }}>Cancelar</button>
