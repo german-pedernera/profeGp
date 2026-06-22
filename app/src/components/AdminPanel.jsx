@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Users, Trash2, CheckCircle, Database, ArrowLeft, RefreshCw, Activity, Eye, EyeOff, X, Edit } from 'lucide-react';
+import { Users, Trash2, CheckCircle, Database, ArrowLeft, RefreshCw, Activity, Eye, EyeOff, X, Edit, UserPlus } from 'lucide-react';
 import './AdminPanel.css';
 
 const AdminPanel = () => {
@@ -16,6 +16,12 @@ const AdminPanel = () => {
   const [editFormData, setEditFormData] = useState({
     nombre: '', apellido: '', email: '', password: '', fechaNacimiento: '', telefono: ''
   });
+
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [addUserData, setAddUserData] = useState({
+    nombre: '', apellido: '', email: '', password: '', fechaNacimiento: '', telefono: ''
+  });
+  const [isAddingUser, setIsAddingUser] = useState(false);
 
   // Status counters
   const [stats, setStats] = useState({ totalUsers: 0, pendingUsers: 0, totalEvals: 0 });
@@ -135,13 +141,71 @@ const AdminPanel = () => {
         apellido: editFormData.apellido,
         email: editFormData.email,
         fechaNacimiento: editFormData.fechaNacimiento,
-        telefono: editFormData.telefono
+        telefono: editFormData.telefono,
+        password: editFormData.password
       }).eq('id', editingUser.id);
       if (error) throw error;
       setEditingUser(null);
       fetchData();
     } catch (error) {
       console.error("Error updating user", error);
+    }
+  };
+
+  const handleAddUserChange = (e) => {
+    setAddUserData({ ...addUserData, [e.target.name]: e.target.value });
+  };
+
+  const handleAddUserSubmit = async (e) => {
+    e.preventDefault();
+    setIsAddingUser(true);
+    try {
+      let emailForAuth = addUserData.email;
+      if (!emailForAuth.includes('@')) {
+         emailForAuth = `${emailForAuth}@gendarmeria.gob.ar`;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email: emailForAuth,
+        password: addUserData.password
+      });
+      if (error) throw error;
+      
+      const newUser = data.user;
+      if (newUser) {
+        const { error: insertError } = await supabase.from('users').insert({
+          id: newUser.id,
+          nombre: addUserData.nombre,
+          apellido: addUserData.apellido,
+          telefono: addUserData.telefono,
+          fechaNacimiento: addUserData.fechaNacimiento,
+          email: emailForAuth,
+          password: addUserData.password,
+          status: 'approved',
+          role: 'user'
+        });
+        if (insertError) throw insertError;
+      }
+      
+      // Sign out the new user immediately so the admin's Supabase auth state is reset
+      await supabase.auth.signOut();
+
+      setShowAddUserModal(false);
+      setAddUserData({ nombre: '', apellido: '', email: '', password: '', fechaNacimiento: '', telefono: '' });
+      fetchData();
+      
+      setAlertConfig({
+        type: 'info',
+        message: 'Usuario agregado y activado con éxito.'
+      });
+    } catch (error) {
+      console.error(error);
+      setAlertConfig({
+        type: 'info',
+        message: 'Error al agregar usuario: ' + error.message
+      });
+    } finally {
+      setIsAddingUser(false);
     }
   };
 
@@ -197,7 +261,12 @@ const AdminPanel = () => {
         <div className="admin-grid">
           {/* User Management */}
           <div className="card admin-section" style={{ gridColumn: 'span 3' }}>
-            <h3>Gestión de Usuarios</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ margin: 0 }}>Gestión de Usuarios</h3>
+              <button className="primary sm-btn" onClick={() => setShowAddUserModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <UserPlus size={16} /> Agregar Usuario Activo
+              </button>
+            </div>
             <div style={{ width: '100%' }}>
               <table className="admin-table" style={{ width: '100%' }}>
                 <thead>
@@ -358,6 +427,60 @@ const AdminPanel = () => {
               <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                 <button type="button" onClick={() => setEditingUser(null)} style={{ flex: 1, padding: '10px', borderRadius: '6px', background: '#f1f5f9', border: '1px solid #cbd5e1', cursor: 'pointer', color: '#475569', fontWeight: 'bold' }}>Cancelar</button>
                 <button type="submit" style={{ flex: 1, padding: '10px', borderRadius: '6px', background: '#10b981', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 'bold' }}>Guardar Cambios</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
+      {/* Add User Modal */}
+      {showAddUserModal && (
+        <div className="modal-overlay" style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
+          backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 10000, 
+          display: 'flex', justifyContent: 'center', alignItems: 'center'
+        }} onClick={() => setShowAddUserModal(false)}>
+          <div className="modal-content" style={{
+            background: 'white', padding: '30px', borderRadius: '12px', 
+            width: '90%', maxWidth: '400px', textAlign: 'left', position: 'relative'
+          }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, color: '#1e293b' }}>Agregar Usuario Activo</h3>
+              <button style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b' }} onClick={() => setShowAddUserModal(false)}>
+                <X size={24} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleAddUserSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '5px', color: '#475569', fontSize: '14px', fontWeight: '500' }}>Nombre</label>
+                <input type="text" name="nombre" value={addUserData.nombre} onChange={handleAddUserChange} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '5px', color: '#475569', fontSize: '14px', fontWeight: '500' }}>Apellido</label>
+                <input type="text" name="apellido" value={addUserData.apellido} onChange={handleAddUserChange} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '5px', color: '#475569', fontSize: '14px', fontWeight: '500' }}>Email o Usuario</label>
+                <input type="text" name="email" value={addUserData.email} onChange={handleAddUserChange} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '5px', color: '#475569', fontSize: '14px', fontWeight: '500' }}>Fecha de Nacimiento</label>
+                <input type="date" name="fechaNacimiento" value={addUserData.fechaNacimiento} onChange={handleAddUserChange} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '5px', color: '#475569', fontSize: '14px', fontWeight: '500' }}>Teléfono</label>
+                <input type="tel" name="telefono" value={addUserData.telefono} onChange={handleAddUserChange} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '5px', color: '#475569', fontSize: '14px', fontWeight: '500' }}>Contraseña</label>
+                <input type="text" name="password" value={addUserData.password} onChange={handleAddUserChange} required style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+              </div>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button type="button" onClick={() => setShowAddUserModal(false)} style={{ flex: 1, padding: '10px', borderRadius: '6px', background: '#f1f5f9', border: '1px solid #cbd5e1', cursor: 'pointer', color: '#475569', fontWeight: 'bold' }}>Cancelar</button>
+                <button type="submit" disabled={isAddingUser} style={{ flex: 1, padding: '10px', borderRadius: '6px', background: '#10b981', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 'bold' }}>
+                  {isAddingUser ? 'Agregando...' : 'Agregar Usuario'}
+                </button>
               </div>
             </form>
           </div>
