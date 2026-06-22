@@ -81,8 +81,21 @@ const Login = ({ user, userData }) => {
          window.location.href = '/dashboard'; // Redirige directamente forzando recarga de App.jsx
          return;
       } else {
+         let authSuccess = false;
          const { error } = await supabase.auth.signInWithPassword({ email, password });
-         if (error) throw error;
+         if (error) {
+            // Fallback: check if the user exists in the 'users' table directly (for manually added users)
+            const { data: fallbackUser } = await supabase.from('users').select('*').eq('email', email).single();
+            if (fallbackUser && fallbackUser.password === password) {
+               authSuccess = true;
+            } else {
+               throw error;
+            }
+         } else {
+            authSuccess = true;
+         }
+         
+         if (authSuccess) {
          
          const usersData = localStorage.getItem('gp_users');
          let userName = 'Usuario Desconocido';
@@ -117,6 +130,7 @@ const Login = ({ user, userData }) => {
            });
          } catch (err) {
            console.error("Telegram notification error:", err);
+         }
          }
       }
     } catch (error) {

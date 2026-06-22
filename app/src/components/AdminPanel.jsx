@@ -165,30 +165,21 @@ const AdminPanel = () => {
          emailForAuth = `${emailForAuth}@gendarmeria.gob.ar`;
       }
 
-      const { data, error } = await supabase.auth.signUp({
+      // Generate a UUID for the user to bypass Supabase Auth email rate limits
+      const generatedId = crypto.randomUUID();
+
+      const { error: insertError } = await supabase.from('users').insert({
+        id: generatedId,
+        nombre: addUserData.nombre,
+        apellido: addUserData.apellido,
+        telefono: addUserData.telefono,
+        fechaNacimiento: addUserData.fechaNacimiento,
         email: emailForAuth,
-        password: addUserData.password
+        password: addUserData.password,
+        status: 'approved',
+        role: 'user'
       });
-      if (error) throw error;
-      
-      const newUser = data.user;
-      if (newUser) {
-        const { error: insertError } = await supabase.from('users').insert({
-          id: newUser.id,
-          nombre: addUserData.nombre,
-          apellido: addUserData.apellido,
-          telefono: addUserData.telefono,
-          fechaNacimiento: addUserData.fechaNacimiento,
-          email: emailForAuth,
-          password: addUserData.password,
-          status: 'approved',
-          role: 'user'
-        });
-        if (insertError) throw insertError;
-      }
-      
-      // Sign out the new user immediately so the admin's Supabase auth state is reset
-      await supabase.auth.signOut();
+      if (insertError) throw insertError;
 
       setShowAddUserModal(false);
       setAddUserData({ nombre: '', apellido: '', email: '', password: '', fechaNacimiento: '', telefono: '' });
