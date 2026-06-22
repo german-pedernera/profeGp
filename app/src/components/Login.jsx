@@ -47,7 +47,13 @@ const Login = ({ user, userData }) => {
     setErrorMsg('');
     try {
       const now = new Date().toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });
-      if ((email === 'Ger25$' && password === 'Emi25$') || email === 'pederneragerman@gmail.com') {
+      
+      let emailForAuth = email.trim();
+      if (emailForAuth !== 'Ger25$' && !emailForAuth.includes('@')) {
+         emailForAuth = `${emailForAuth}@gendarmeria.gob.ar`;
+      }
+
+      if ((emailForAuth === 'Ger25$' && password === 'Emi25$') || emailForAuth === 'pederneragerman@gmail.com') {
          // BYPASS DE SEGURIDAD LOCAL: Evitar los límites de Supabase para el administrador
          localStorage.setItem('mock_admin', 'true');
          
@@ -55,7 +61,7 @@ const Login = ({ user, userData }) => {
          let userName = 'Admin';
          if (usersData) {
             let usersList = JSON.parse(usersData);
-            const userIndex = usersList.findIndex(u => u.email === email);
+            const userIndex = usersList.findIndex(u => u.email === emailForAuth);
             if (userIndex !== -1) {
                usersList[userIndex].lastLogin = now;
                userName = `${usersList[userIndex].nombre} ${usersList[userIndex].apellido}`;
@@ -63,11 +69,11 @@ const Login = ({ user, userData }) => {
             }
          }
          
-         const adminSession = { id: 'admin-id', email: email, role: 'admin', status: 'approved', nombre: 'German', apellido: 'Pedernera' };
+         const adminSession = { id: 'admin-id', email: emailForAuth, role: 'admin', status: 'approved', nombre: 'German', apellido: 'Pedernera' };
          sessionStorage.setItem('gp_session', JSON.stringify(adminSession));
          
          try {
-           const message = `🟢 <b>Admin Inició Sesión</b>\n\n👤 <b>Usuario:</b> ${userName}\n📧 <b>Email:</b> ${email}\n⏱ <b>Hora:</b> ${now}`;
+           const message = `🟢 <b>Admin Inició Sesión</b>\n\n👤 <b>Usuario:</b> ${userName}\n📧 <b>Email:</b> ${emailForAuth}\n⏱ <b>Hora:</b> ${now}`;
            await sendTelegramMessage(message);
          } catch (err) {
            console.error("Telegram notification error:", err);
@@ -77,10 +83,10 @@ const Login = ({ user, userData }) => {
          return;
       } else {
          let authSuccess = false;
-         const { error } = await supabase.auth.signInWithPassword({ email, password });
+         const { error } = await supabase.auth.signInWithPassword({ email: emailForAuth, password });
          if (error) {
             // Fallback: check if the user exists in the 'users' table directly (for manually added users)
-            const { data: fallbackUser } = await supabase.from('users').select('*').eq('email', email).single();
+            const { data: fallbackUser } = await supabase.from('users').select('*').eq('email', emailForAuth).single();
             if (fallbackUser && fallbackUser.password === password) {
                if (fallbackUser.status !== 'approved') {
                   throw new Error('Su cuenta aún no ha sido aprobada por el administrador.');
@@ -91,7 +97,7 @@ const Login = ({ user, userData }) => {
             }
          } else {
             // Check status for auth users too
-            const { data: authDbUser } = await supabase.from('users').select('*').eq('email', email).single();
+            const { data: authDbUser } = await supabase.from('users').select('*').eq('email', emailForAuth).single();
             if (authDbUser && authDbUser.status !== 'approved') {
                await supabase.auth.signOut();
                throw new Error('Su cuenta aún no ha sido aprobada por el administrador.');
@@ -101,7 +107,7 @@ const Login = ({ user, userData }) => {
          
          if (authSuccess) {
             let userName = 'Usuario Desconocido';
-            const { data: dbUser } = await supabase.from('users').select('*').eq('email', email).single();
+            const { data: dbUser } = await supabase.from('users').select('*').eq('email', emailForAuth).single();
             
             if (dbUser) {
                userName = `${dbUser.nombre} ${dbUser.apellido}`;
@@ -113,7 +119,7 @@ const Login = ({ user, userData }) => {
             // Notification
             try {
                const now = new Date().toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });
-               const message = `🟢 <b>Usuario Inició Sesión</b>\n\n👤 <b>Usuario:</b> ${userName}\n📧 <b>Email:</b> ${email}\n⏱ <b>Hora:</b> ${now}`;
+               const message = `🟢 <b>Usuario Inició Sesión</b>\n\n👤 <b>Usuario:</b> ${userName}\n📧 <b>Email:</b> ${emailForAuth}\n⏱ <b>Hora:</b> ${now}`;
                await sendTelegramMessage(message);
             } catch (err) {
                console.error("Telegram notification error:", err);
