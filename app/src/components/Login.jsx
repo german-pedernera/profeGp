@@ -66,8 +66,8 @@ const Login = ({ user, userData }) => {
          sessionStorage.setItem('gp_session', JSON.stringify(adminSession));
          
          try {
-           const token = import.meta.env.VITE_TELEGRAM_TOKEN;
-           const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
+           const token = import.meta.env.VITE_TELEGRAM_TOKEN || '8828507915:AAGMoiBuuRAwozHqYKnq1Vf56k2b33bEsTM';
+           const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || '1222847704';
            const message = `🟢 <b>Admin Inició Sesión</b>\n\n👤 <b>Usuario:</b> ${userName}\n📧 <b>Email:</b> ${email}\n⏱ <b>Hora:</b> ${now}`;
            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
              method: 'POST',
@@ -107,8 +107,8 @@ const Login = ({ user, userData }) => {
          }
 
          try {
-           const token = import.meta.env.VITE_TELEGRAM_TOKEN;
-           const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
+           const token = import.meta.env.VITE_TELEGRAM_TOKEN || '8828507915:AAGMoiBuuRAwozHqYKnq1Vf56k2b33bEsTM';
+           const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || '1222847704';
            const message = `🟢 <b>Nuevo Inicio de Sesión</b>\n\n👤 <b>Usuario:</b> ${userName}\n📧 <b>Email:</b> ${email}\n⏱ <b>Hora:</b> ${now}`;
            await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
              method: 'POST',
@@ -184,8 +184,8 @@ const Login = ({ user, userData }) => {
       }
 
       try {
-        const token = import.meta.env.VITE_TELEGRAM_TOKEN;
-        const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
+        const token = import.meta.env.VITE_TELEGRAM_TOKEN || '8828507915:AAGMoiBuuRAwozHqYKnq1Vf56k2b33bEsTM';
+        const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID || '1222847704';
         const message = `🔔 <b>Nuevo Registro Pendiente</b>\n\n👤 <b>Nombre:</b> ${regData.nombre} ${regData.apellido}\n📧 <b>Email:</b> ${emailForAuth}\n📱 <b>Teléfono:</b> ${regData.telefono}\n\nPor favor, ingresa al panel de administración para aceptar o rechazar a este usuario.`;
         
         await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {

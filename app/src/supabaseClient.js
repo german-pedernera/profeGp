@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://gavcfhdaakajffrlpaqz.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdhdmNmaGRhYWthamZmcmxwYXF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5MDA4OTgsImV4cCI6MjA5NzQ3Njg5OH0.fADUcuvx6D2SQQaLfiW2cP52JETH6F5aebV2LYUfdZ4';
 
 // Safe dummy client to prevent startup crashes when env vars are missing (e.g. in deployment)
 const createDummyClient = () => {
